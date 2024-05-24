@@ -1,6 +1,6 @@
 from sqlalchemy import create_engine
 import pandas as pd
-from flask import Flask, render_template, jsonify
+from flask import Flask, render_template, jsonify, request
 
 
 # Initialize Flask app
@@ -13,24 +13,26 @@ DATABASE_URI = 'mysql://admin:Pu$hkar121@localhost:3306/mydatabase'
 engine = create_engine(DATABASE_URI)
 
 # Function to retrieve data from tables
-def get_data_from_db(engine, table_name):
-    query = f"SELECT * FROM {table_name} ORDER BY date desc, item"
+def get_data_from_db(engine, table_name, start_date, end_date):
+    query = f"SELECT * FROM {table_name} where date between '{start_date}' and '{end_date}' ORDER BY date desc, item"
     return pd.read_sql(query, engine)
 
-def get_recdata_from_db(engine, table_name):
-    query = f"SELECT Item, SUM(total) Total, SUM(quantity) Quantity, AVG(price) Price, Date FROM {table_name} GROUP BY date, item ORDER BY date desc, item"
+def get_recdata_from_db(engine, table_name, start_date, end_date):
+    query = f"SELECT Item, SUM(total) Total, SUM(quantity) Quantity, AVG(price) Price, Date FROM {table_name} where date between '{start_date}' and '{end_date}' GROUP BY date, item ORDER BY date desc, item"
     return pd.read_sql(query, engine)
 
 @app.route('/')
 def index():
     return render_template('index.html')
 
-@app.route('/data')
+@app.route('/data', methods=['GET'])
 def get_data():
+    start_date = request.args.get('start_date')
+    end_date = request.args.get('end_date')
         
     # Retrieve daily spent and daily received data
-    df_spent = get_data_from_db(engine, 'spent_data')
-    df_received = get_recdata_from_db(engine, 'grndata')
+    df_spent = get_data_from_db(engine, 'spent_data',start_date, end_date)
+    df_received = get_recdata_from_db(engine, 'grndata', start_date, end_date)
 
     # Normalize column names to have consistent names for merging
     df_received = df_received.rename(columns={
@@ -60,11 +62,8 @@ def get_data():
     df_merged['daily_profit_loss'] = round(df_merged['total_received'] - df_merged['total_spent'],2)
 
     # Calculate cumulative profit/loss for each item
-    df_merged['cumulative_profit_loss'] = round(df_merged.groupby('item')['daily_profit_loss'].cumsum(),2)
-
-    # Aggregate data to get daily totals and prepare the response format
-    # df_merged['date'] = pd.to_datetime(df_merged['date'])  # Ensure date is in datetime format for grouping
-
+    # df_merged['cumulative_profit_loss'] = round(df_merged.groupby('item')['daily_profit_loss'].cumsum(),2)
+   
     # Group by date to get the total spent, received, and daily profit/loss
     daily_summary = df_merged.groupby('date').agg({
         'total_spent': 'sum',
