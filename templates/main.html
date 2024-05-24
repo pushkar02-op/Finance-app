@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tabs Example</title>
+    <link rel="stylesheet" type="text/css" href="/static/css/main.css" />
+  </head>
+  <body>
+    <div id="tabButton">
+      <button
+        class="tablink"
+        onclick="openPage('form', this, 'red')"
+        id="defaultOpen"
+      >
+        Data Entry
+      </button>
+      <button class="tablink" onclick="openPage('app', this, 'green')">
+        Data Display
+      </button>
+    </div>
+    <div id="form" class="tabcontent">
+      <div class="entrycontainer">
+        <form id="dataForm" method="post" action="/submit">
+          <h2>Data Entry Form</h2>
+          <label for="date">Date:</label><br />
+          <input type="date" id="date" name="date" required /><br />
+          <label for="item">Item:</label><br />
+          <select id="item" name="item" required>
+            <option value="">Select an item</option></select
+          ><br />
+          <label for="qty">Quantity:</label><br />
+          <input
+            type="number"
+            id="qty"
+            name="qty"
+            step="0.01"
+            min="0.01"
+            required
+          /><br />
+          <label for="price">Price:</label><br />
+          <input
+            type="number"
+            id="price"
+            name="price"
+            step="0.01"
+            min="0.01"
+            required
+          /><br />
+          <label for="total">Total Price:</label><br />
+          <input type="text" id="total" name="total" readonly /><br />
+          <input type="submit" value="Submit Data" />
+        </form>
+        <div id="dataContainer">
+          <div id="displayDate">
+            <form>
+              <input type="date" id="pickedDate" name="date" required /><br />
+            </form>
+          </div>
+          <div id="dataTable"></div>
+          <div class="pagination">
+            <button id="firstPage" onclick="showFirstPageData()">
+              First Page
+            </button>
+            <button id="prevButton" onclick="showPrevData()">Previous</button>
+            <span id="currentPage">Page 1</span>
+            <button id="nextButton" onclick="showNextData()">Next</button>
+
+            <button id="lastPage" onclick="fetchAndDisplayData(selectedDate)">
+              Refresh
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="notification" id="notification">
+        Data entered successfully!
+      </div>
+    </div>
+
+    <div id="app" class="tabcontent">
+      <h3>News</h3>
+      <p>Some news this fine day!</p>
+    </div>
+    <script>
+      function openPage(pageName, elmnt, color) {
+        // Hide all elements with class="tabcontent" by default */
+        var i, tabcontent, tablinks;
+        tabcontent = document.getElementsByClassName("tabcontent");
+        for (i = 0; i < tabcontent.length; i++) {
+          tabcontent[i].style.display = "none";
+        }
+
+        // Remove the background color of all tablinks/buttons
+        tablinks = document.getElementsByClassName("tablink");
+        for (i = 0; i < tablinks.length; i++) {
+          tablinks[i].style.backgroundColor = "";
+        }
+
+        // Show the specific tab content
+        document.getElementById(pageName).style.display = "inline";
+
+        // Add the specific color to the button used to open the tab content
+        elmnt.style.backgroundColor = color;
+      }
+
+      // Get the element with id="defaultOpen" and click on it
+      document.getElementById("defaultOpen").click();
+    </script>
+    <script src="/static/js/options.js"></script>
+    <script src="/static/js/form.js"></script>
+  </body>
+</html>

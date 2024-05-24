@@ -9,6 +9,20 @@
       href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
     />
     <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        margin: 0;
+        padding: 0;
+      }
+      .container {
+        width: 80%;
+        padding: 20px;
+        background-color: #fff;
+        border-radius: 5px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        height: 100vh;
+      }
       .profit {
         background-color: #d4edda;
       }
@@ -18,8 +32,17 @@
       .child-table-row {
         background-color: #e9ecef;
       }
-      .table {
-        margin-bottom: 0rem !important;
+
+      #dataTable {
+        min-height: 70vh;
+      }
+      #data-tbody tr td {
+        padding: 10px;
+      }
+
+      .mt-3 tbody tr,
+      .mt-3 tbody tr td {
+        vertical-align: middle;
       }
       .child-table-row th,
       .child-table-row tbody tr td {
@@ -27,14 +50,61 @@
         font-size: 0.85rem;
         line-height: 1;
       }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        /* table-layout: fixed; */
+      }
+
+      table,
+      th,
+      td {
+        border: 1px solid #ccc;
+      }
+
+      th,
+      td {
+        padding: 10px;
+        text-align: left;
+        max-height: fit-content;
+      }
+
+      th {
+        background-color: #f2f2f2;
+      }
+
+      tbody {
+        overflow-y: auto;
+      }
+
+      thead {
+        width: 100%;
+        table-layout: fixed;
+      }
+      .pagination {
+        justify-content: center;
+      }
+      .date-filter-form {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 20px;
+      }
+      .date-filter-form label,
+      .date-filter-form input,
+      .date-filter-form button {
+        margin-right: 10px;
+      }
+      #monthly-profit-loss {
+        text-align: center;
+      }
     </style>
   </head>
   <body>
     <div class="container">
-      <h1 class="mt-5">Profit and Loss</h1>
       <!-- Monthly Profit/Loss Display -->
       <div id="monthly-profit-loss" class="alert alert-info">
-        Total Profit/Loss: <span id="monthly-profit-loss-amount">0.00</span>
+        Total Profit: <span id="monthly-profit-loss-amount">0.00</span>
       </div>
 
       <!-- Date Filter Form -->
@@ -51,18 +121,19 @@
           Apply Filter
         </button>
       </form>
-
-      <table class="table mt-3">
-        <thead>
-          <tr>
-            <th>Date</th>
-            <th>Total Spent</th>
-            <th>Total Received</th>
-            <th>Daily Profit/Loss</th>
-          </tr>
-        </thead>
-        <tbody id="data-tbody"></tbody>
-      </table>
+      <div id="dataTable">
+        <table class="table mt-3">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Total Spent</th>
+              <th>Total Received</th>
+              <th>Daily Profit/Loss</th>
+            </tr>
+          </thead>
+          <tbody id="data-tbody"></tbody>
+        </table>
+      </div>
       <ul id="pagination" class="pagination"></ul>
     </div>
     <script>
@@ -231,6 +302,20 @@
           fetchData(startDate, endDate);
         }
       }
+
+      // async function keepServerAlive() {
+      //   const response = await fetch("/keep-alive", {
+      //     method: "GET",
+      //     cache: "no-cache",
+      //   });
+      //   const data = await response.json();
+      //   console.log(data);
+      // }
+
+      // document.addEventListener("DOMContentLoaded", function () {
+      //   // Set interval to send keep-alive requests every 3 seconds
+      //   setInterval(keepServerAlive, 3000);
+      // });
     </script>
   </body>
 </html>

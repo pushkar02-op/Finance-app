@@ -27,7 +27,6 @@ def home():
 
 @app.route("/submit", methods=["POST"])
 def submit():
-    print(request.form)
     date = request.form["date"]
     item = request.form["item"]
     qty = request.form["qty"]
