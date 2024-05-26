@@ -64,7 +64,6 @@ document.getElementById("pickedDate").addEventListener("change", function () {
 function displayData(data) {
   // data.sort((a, b) => a.item.localeCompare(b.item));
   const table = document.createElement("table");
-  console.log("CLick");
   table.innerHTML = `
               <tr>
                   

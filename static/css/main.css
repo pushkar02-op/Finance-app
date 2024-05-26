@@ -59,7 +59,7 @@ h1 {
   justify-content: space-around;
 
   #fileform {
-    width: 25vw;
+    width: 30vw;
     margin-bottom: 5px;
     border: 1px solid #ddd;
     padding: 10px;
@@ -68,6 +68,9 @@ h1 {
     height: 60vh;
     overflow-y: auto;
     cursor: pointer;
+  }
+  .filecontainer {
+    padding-top: 20px;
   }
   #filedataContainer {
     width: 60vw;
@@ -172,6 +175,26 @@ h1 {
       table-layout: fixed;
     }
   }
+  tr:hover {
+    background-color: #f1f1f1;
+  }
+  .actions {
+    display: none;
+  }
+  tr:hover .actions {
+    display: inline;
+  }
+  .focused-row {
+    background-color: #e0f7fa;
+  }
+  .editable {
+    background-color: #fff3e0;
+  }
+  .edit-icon,
+  .delete-icon {
+    cursor: pointer;
+    margin-left: 5px;
+  }
   .pagination {
     text-align: center;
     display: flex;
@@ -196,6 +219,29 @@ h1 {
     background-color: #ddd;
     color: #999;
     cursor: not-allowed;
+  }
+  #notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background-color: #333;
+    color: #fff;
+    padding: 10px;
+    border-radius: 5px;
+    z-index: 9999;
+    display: none;
+  }
+
+  #notification.show {
+    display: block;
+  }
+
+  #notification.success {
+    background-color: green;
+  }
+
+  #notification.error {
+    background-color: red;
   }
 }
 

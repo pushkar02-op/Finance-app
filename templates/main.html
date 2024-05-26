@@ -24,6 +24,7 @@
     </div>
     <div id="file" class="tabcontent">
       <div id="filetab">
+        <div id="notification"></div>
         <div class="filecontainer">
           <div id="fileform">
             <form
@@ -76,10 +77,7 @@
             <span id="currentGRNPage">Page 1</span>
             <button id="nextButton" onclick="showNextGRNData()">Next</button>
 
-            <button
-              id="lastPage"
-              onclick="fetchAndDisplayGRNData(selectedDate)"
-            >
+            <button id="lastPage" onclick="showLastPageGRNData()">
               Refresh
             </button>
           </div>

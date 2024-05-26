@@ -406,7 +406,6 @@ def file_data():
     
     elif request.method=='GET':
         req_date = request.args.get("reqdate")
-        print(req_date)
         with engine.connect() as connection:
             query = text(f"""
             SELECT * 
@@ -421,7 +420,7 @@ def file_data():
         data = []
         for row in grndata:
             row_data = {
-                "ITEM_CODE": row.ITEM_CODE,
+                "SR_NO": row.Sr_No,
                 "ITEM": row.Item,
                 "QUANTITY": row.Quantity,
                 "PRICE": row.Price,
@@ -431,7 +430,47 @@ def file_data():
             data.append(row_data)
 
     return jsonify(data)
-        
+
+
+@app.route('/updateRow', methods=['POST'])
+def update_row():
+    data = request.json
+    sr_no = data.get('SR_NO')
+    updated_data = {
+        "Quantity": data.get('QUANTITY'),
+        "Price": data.get('PRICE'),
+        "Total": data.get('TOTAL'),
+    }
+
+    with engine.connect() as connection:
+        query = text(f"""
+        UPDATE {TABLE_NAME}
+        SET Quantity = :Quantity,
+            Price = :Price,
+            Total = :Total
+        WHERE Sr_No = :SR_NO
+        """)
+        connection.execute(query, {
+                    "Quantity": updated_data["Quantity"],
+                    "Price": updated_data["Price"],
+                    "Total": updated_data["Total"],
+                    "SR_NO": sr_no
+                })
+        connection.commit() 
+
+    return jsonify(success=True)
+
+@app.route('/deleteRow', methods=['POST'])
+def delete_row():
+    data = request.json
+    sr_no = data.get('SR_NO')
+
+    with engine.connect() as connection:
+        query = text(f"DELETE FROM {TABLE_NAME} WHERE Sr_No = :SR_NO")
+        connection.execute(query, {'SR_NO': sr_no})
+        connection.commit() 
+    return jsonify(success=True)
+
 if __name__ == "__main__":
     if not os.path.exists('temp'):
         os.makedirs('temp')
