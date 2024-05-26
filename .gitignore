@@ -24,4 +24,5 @@ Thumbs.db
 coverage/
 DATA/
 env/
+_pycache_/
 

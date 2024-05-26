@@ -1,6 +1,7 @@
 // options.js
 
 const optionsList = [
+  "OTHER COST",
   "APPLE FUJI (KG)",
   "APPLE GRANNY SMITH (KG)",
   "APPLE JAMMU KASHMIR VALUE",
@@ -45,6 +46,7 @@ const optionsList = [
   "MANGO DUSSHERI",
   "MANGO LANGDA KG",
   "MANGO RASPURI KG",
+  "MANGO SINDURI KG",
   "MINT LEAVES BUNCH",
   "MOSAMBI SMALL",
   "MUSK MELON (KG)",

@@ -1,27 +1,182 @@
-import pdfplumber
+from flask import Flask, render_template, request, jsonify
+from flask_sqlalchemy import SQLAlchemy
 import pandas as pd
-import os
-import glob
-from watchdog.observers import Observer
-from watchdog.events import FileSystemEventHandler
-import time
-from sqlalchemy import create_engine, inspect, Table, Column, Integer, String, Float, MetaData, DateTime
+import pdfplumber
+from sqlalchemy import create_engine, inspect,text, Table, Column, Integer, String, Float, MetaData, DateTime,UniqueConstraint
+import hashlib
+import re
 from sqlalchemy.exc import SQLAlchemyError
 from datetime import datetime
-import re
+import os
+
+
+
+
+app = Flask(__name__)
+
 
 # MySQL database configuration
 DATABASE_URI = 'mysql://admin:Pu$hkar121@localhost:3306/mydatabase'
 TABLE_NAME = 'grndata'
+HASH_TABLE_NAME = 'file_hashes'
+
+# Create a connection to the database
 engine = create_engine(DATABASE_URI)
 
-# Dictionary to keep track of processed files by date and size
-processed_files = {}
+# Function to retrieve data from tables
+def get_data_from_db(engine, table_name, start_date, end_date):
+    query = f"SELECT * FROM {table_name} where date between '{start_date}' and '{end_date}' ORDER BY date desc, item"
+    return pd.read_sql(query, engine)
 
-# Function to check if a table exists in the database
-def table_exists(engine, table_name):
-    inspector = inspect(engine)
-    return table_name in inspector.get_table_names()
+def get_recdata_from_db(engine, table_name, start_date, end_date):
+    query = f"SELECT Item, SUM(total) Total, SUM(quantity) Quantity, AVG(price) Price, Date FROM ( SELECT *, ROW_NUMBER() OVER(PARTITION BY date,item,storename,quantity,price,total ORDER BY sr_no ASC) AS ronum FROM {table_name} )X where ronum=1 AND date between '{start_date}' and '{end_date}' GROUP BY date, item ORDER BY date desc, item"
+    return pd.read_sql(query, engine)
+
+
+@app.route('/data', methods=['GET'])
+def data():
+    start_date = request.args.get('start_date')
+    end_date = request.args.get('end_date')
+        
+    # Retrieve daily spent and daily received data
+    df_spent = get_data_from_db(engine, 'spent_data',start_date, end_date)
+    df_received = get_recdata_from_db(engine, 'grndata', start_date, end_date)
+
+    # Normalize column names to have consistent names for merging
+    df_received = df_received.rename(columns={
+        'Item': 'item',
+        'Quantity': 'qty',
+        'Price': 'price',
+        'Total': 'total',
+        'Date': 'date'
+    })
+    # print(df_received)
+    # Standardize date formats
+    df_spent['date'] = pd.to_datetime(df_spent['date'], dayfirst=False).dt.strftime('%Y-%m-%d')
+    df_received['date'] = pd.to_datetime(df_received['date'], dayfirst=True).dt.strftime('%Y-%m-%d')
+    df_received['qty'] = round(df_received['qty'],2)
+    df_received['total'] = round(df_received['total'],2)
+    df_received['price'] = round(df_received['price'],2)
+    
+    
+    # Trim whitespace from item names
+    df_spent['item'] = df_spent['item'].str.strip()
+    df_received['item'] = df_received['item'].str.strip()
+    
+    # Separate 'OTHER COST' from df_spent
+    df_other_costs = df_spent[df_spent['item'] == 'OTHER COST']
+    df_spent = df_spent[df_spent['item'] != 'OTHER COST']
+    
+    # Merge the data on the date and item columns
+    df_merged = pd.merge(df_spent, df_received, on=['date', 'item'], suffixes=('_spent', '_received'))
+
+    # Calculate daily profit/loss for each item
+    df_merged['daily_profit_loss'] = round(df_merged['total_received'] - df_merged['total_spent'],2)
+
+    # Group by date to get the total spent, received, and daily profit/loss
+    daily_summary = df_merged.groupby('date').agg({
+        'total_spent': 'sum',
+        'total_received': 'sum',
+        'daily_profit_loss': 'sum'
+    }).reset_index()
+    
+    # Include 'OTHER COST' in the daily summary
+    if not df_other_costs.empty:
+        other_costs_summary = df_other_costs.groupby('date').agg({'total': 'sum'}).reset_index()
+        other_costs_summary = other_costs_summary.rename(columns={'total': 'other_costs'})
+        daily_summary = pd.merge(daily_summary, other_costs_summary, on='date', how='left')
+        daily_summary['other_costs'] = daily_summary['other_costs'].fillna(0)
+    else:
+        daily_summary['other_costs'] = 0
+
+    # Adjust daily profit/loss to include 'OTHER COST'
+    daily_summary['daily_profit_loss'] = round(daily_summary['daily_profit_loss'] - daily_summary['other_costs'], 2)
+
+    #Rounding it off to 2 digits
+    daily_summary['total_spent'] = round(daily_summary['total_spent'],2)
+    daily_summary['total_received'] = round(daily_summary['total_received'],2)
+    daily_summary['daily_profit_loss'] = round(daily_summary['daily_profit_loss'],2)
+    daily_summary['other_costs'] = round(daily_summary['other_costs'], 2)
+
+
+    daily_summary['items'] = daily_summary['date'].apply(
+        lambda d: df_merged[df_merged['date'] == d].sort_values(by='item').to_dict(orient='records')
+    )
+    daily_summary = daily_summary.sort_values(by='date', ascending=False)
+    response_data = daily_summary.to_dict(orient='records')
+    return jsonify(response_data)
+
+
+
+
+# Configuration for SQLAlchemy
+app.config['SQLALCHEMY_DATABASE_URI'] = f"mysql://admin:Pu$hkar121@localhost/mydatabase"
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+db = SQLAlchemy(app)
+
+class SpentData(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    date = db.Column(db.DateTime, nullable=False)
+    item = db.Column(db.String(100), nullable=False)
+    qty = db.Column(db.Float, nullable=False)
+    price = db.Column(db.Float, nullable=False)
+    total = db.Column(db.Float, nullable=False)
+
+# Create the database
+with app.app_context():
+    db.create_all()
+
+@app.route("/")
+def home():
+    return render_template("main.html")
+
+@app.route("/submit", methods=["POST"])
+def submit():
+    date = request.form["date"]
+    item = request.form["item"]
+    qty = request.form["qty"]
+    price = request.form["price"]
+    total = request.form["total"]
+
+    # Check if data with the same date and item already exists
+    existing_data = SpentData.query.filter_by(date=date, item=item).first()
+    if existing_data:
+        # Update existing row with the same date and item
+        existing_data.qty = qty
+        existing_data.price = price
+        existing_data.total = total
+    else:
+        # If data with the same date and item does not exist, create a new row
+        new_data = SpentData(date=date, item=item, qty=qty, price=price, total=total)
+        db.session.add(new_data)
+    
+    db.session.commit()
+    return "Data submitted successfully!"
+
+@app.route("/get_data")
+def get_data():
+    req_date = request.args.get("reqdate")
+    
+    data = SpentData.query.filter_by(date=req_date).order_by(SpentData.date.desc(), SpentData.item.asc()).all()
+    if not data:
+        return jsonify([])  # Return empty list if no data found for the given date
+
+    result = []
+    for row in data:
+        row_data = {
+            "date": row.date,
+            "item": row.item,
+            "qty": row.qty,
+            "price": row.price,
+            "total": row.total
+        }
+        result.append(row_data)
+
+    return jsonify(result)
+
+##File data backend
+
 
 # Define table schema
 metadata = MetaData()
@@ -40,24 +195,78 @@ data_table = Table(
     Column('StoreName', String(255))
 )
 
+hash_table = Table(
+    HASH_TABLE_NAME, metadata,
+    Column('id', Integer, primary_key=True, autoincrement=True),
+    Column('file_hash', String(64), nullable=False),
+    Column('store_name', String(255)),
+    Column('file_date', DateTime),
+    UniqueConstraint('file_hash', 'store_name', 'file_date', name='unique_file')
+)
+
+# Create tables if they don't exist
+metadata.create_all(engine)
+
+# Function to check if a table exists in the database
+def table_exists(engine, table_name):
+    inspector = inspect(engine)
+    return table_name in inspector.get_table_names()
+
+def compute_file_hash(file_path):
+    hash_func = hashlib.sha256()
+    with open(file_path, 'rb') as f:
+        while chunk := f.read(8192):
+            hash_func.update(chunk)
+    return hash_func.hexdigest()
+
+
+def is_duplicate_file(file_hash, store_name, file_date):
+    with engine.connect() as connection:
+        query = text(f"""
+        SELECT COUNT(*) 
+        FROM {HASH_TABLE_NAME} 
+        WHERE file_hash = :file_hash 
+        AND store_name = :store_name 
+        AND file_date = :file_date
+        """)
+        params = {'file_hash': file_hash, 'store_name': store_name, 'file_date': file_date}
+        result = connection.execute(query, params).scalar()
+        return result > 0
+
+
+def store_file_hash(file_hash, store_name, file_date):
+    with engine.connect() as connection:
+        metadata.create_all(engine)
+        query = text(f"""
+        INSERT INTO {HASH_TABLE_NAME} (file_hash, store_name, file_date) 
+        VALUES ('{file_hash}', '{store_name}', '{file_date}')
+        """)        
+        try:
+            connection.execute(query)
+            connection.commit()  
+            print("Data inserted into hash table successfully!")
+        except SQLAlchemyError as e:
+            print(f"Error inserting data into hash table: {e}")
+        
+    
 # Function to store data to MySQL database
 def store_to_db(df, engine, table):
     try:
         if not table_exists(engine, table.name):
-            # Create the table with column headers if it does not exist
             metadata.create_all(engine)
             df.to_sql(table.name, con=engine, if_exists='append', index=False)
             print(f"Table '{table.name}' created and data has been stored successfully!")
         else:
-            # Insert only rows if the table already exists
             df.to_sql(table.name, con=engine, if_exists='append', index=False)
             print(f"Data has been appended to the existing table '{table.name}' successfully!")
+        
     except SQLAlchemyError as e:
         print(f"Error storing data to the database: {e}")
 
 # Function to process a single PDF file
-def process_pdf(input_file, output_folder):
+def process_pdf(input_file):
     file_size = os.path.getsize(input_file)
+    file_hash = compute_file_hash(input_file)
 
     # Extract tables from PDF using pdfplumber
     with pdfplumber.open(input_file) as pdf:
@@ -86,12 +295,10 @@ def process_pdf(input_file, output_folder):
     file_date = datetime.strptime(date_str, "%d.%m.%Y")
     df['Date'] = file_date
 
-    # Check if the file has already been processed
-    if (file_date, file_size) in processed_files:
-        print(f"File '{input_file}' with date {file_date} and size {file_size} has already been processed. Skipping.")
+    if is_duplicate_file(file_hash, place_name, file_date):
+        print(f"Duplicate file detected for {place_name} on {file_date}. Skipping processing.")
         return
-    else:
-        processed_files[(file_date, file_size)] = True
+    
     df=df[8:]
 
 
@@ -162,76 +369,70 @@ def process_pdf(input_file, output_folder):
     df['Price'] = round(df['Price'], 2)
     df['Total'] = round(df['Total'], 2)
 
-    # Change the output file name and add the date from the column in the file name
-    excel_file_path = f"{output_folder}\\GRN_{place_name}_{date_from_column}.xlsx"
+    store_to_db(df, engine, data_table)
+    store_file_hash(file_hash, place_name, file_date)
+
+@app.route('/FILEDATA', methods=['GET', 'POST'])
+def file_data():
+    if request.method == 'POST':
+        # Check if files are present in the request
+        if 'files' not in request.files:
+            return jsonify(error="No file part in the request"), 400
+
+        files = request.files.getlist('files')
+        response_data = []
+
+        # Process each file
+        for file in files:
+            if file.filename == '':
+                response_data.append({"filename": file.filename, "success": False, "error": "No selected file"})
+                continue
+            if file:
+                # Save the file temporarily
+                temp_file_path = os.path.join('temp', file.filename)
+                file.save(temp_file_path)
+
+                try:
+                    # Process the PDF file
+                    process_pdf(temp_file_path)
+                    response_data.append({"filename": file.filename, "success": True})
+                except Exception as e:
+                    response_data.append({"filename": file.filename, "success": False, "error": str(e)})
+
+                # Remove the temporary file
+                os.remove(temp_file_path)
+
+        return jsonify(response_data)
     
-    # Function to create a unique file name
-    def get_unique_filename(base_path, base_name, extension):
-        counter = 1
-        new_path = f"{base_path}\\{base_name}{extension}"
-        while os.path.exists(new_path):
-            new_path = f"{base_path}\\{base_name}_{counter}{extension}"
-            counter += 1
-        return new_path    
-    
-    # Check if the file already exists
-    if not os.path.exists(excel_file_path):
-        # Export DataFrame to an Excel file with the new file name
-        df.to_excel(excel_file_path, index=False)
-        print(f"Data has been extracted from the PDF and saved to Excel file: {excel_file_path}")
+    elif request.method=='GET':
+        req_date = request.args.get("reqdate")
+        print(req_date)
+        with engine.connect() as connection:
+            query = text(f"""
+            SELECT * 
+            FROM {TABLE_NAME} 
+            WHERE Date = '{req_date}' 
+            ORDER BY Date desc, item 
+            """)
+            grndata = connection.execute(query).fetchall()
+                
+        if not grndata:
+            return jsonify([])  # Return empty list if no data found for the given date
+        data = []
+        for row in grndata:
+            row_data = {
+                "ITEM_CODE": row.ITEM_CODE,
+                "ITEM": row.Item,
+                "QUANTITY": row.Quantity,
+                "PRICE": row.Price,
+                "TOTAL": row.Total,
+                "STORENAME":row.StoreName
+            }
+            data.append(row_data)
 
-        # Store data to MySQL database
-        store_to_db(df, engine, data_table)
-    else:
-        excel_file_path = get_unique_filename(output_folder, f"GRN_{place_name}_{date_from_column}", ".xlsx")
-        # Export DataFrame to an Excel file with the new file name
-        df.to_excel(excel_file_path, index=False)
-        print(f"Data has been extracted from the PDF and saved to Excel file: {excel_file_path}")
-
-        # Store data to MySQL database
-        store_to_db(df, engine, data_table)
-
-
-# Source folder containing PDF files
-source_folder = "DATA\\SOURCE_FILES\\"
-
-# Destination folder to save output files
-destination_folder = "DATA\\TARGET_FILES\\"
-
-# # Get a list of all PDF files in the source folder
-# pdf_files = glob.glob(os.path.join(source_folder, "*.pdf"))
-
-# # Process each PDF file
-# for pdf_file in pdf_files:
-   
-#     # Process the PDF file and save the output file in the output folder
-#     process_pdf(pdf_file, destination_folder)
-
-
-class PDFHandler(FileSystemEventHandler):
-    def __init__(self, output_folder):
-        self.output_folder = output_folder
-
-    def on_created(self, event):
-        if event.src_path.endswith((".pdf",".PDF")):
-            print(f"New PDF file detected: {event.src_path}")
-            time.sleep(1)
-            process_pdf(event.src_path, self.output_folder)
-
-
-# Set up event handler and observer
-event_handler = PDFHandler(destination_folder)
-observer = Observer()
-observer.schedule(event_handler, path=source_folder, recursive=False)
-
-# Start observer
-observer.start()
-print(f"Monitoring {source_folder} for new PDF files...")
-
-try:
-    while True:
-        time.sleep(1)
-except KeyboardInterrupt:
-    observer.stop()
-
-observer.join()
+    return jsonify(data)
+        
+if __name__ == "__main__":
+    if not os.path.exists('temp'):
+        os.makedirs('temp')
+    app.run(debug=True)
