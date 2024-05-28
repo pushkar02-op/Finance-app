@@ -14,7 +14,15 @@ import os
 
 app = Flask(__name__)
 
+DB_USERNAME = 'admin'
+DB_PASSWORD = 'Pu$hkar121'
+DB_HOST = 'mydatabase.cnqug0sk235z.ap-south-1.rds.amazonaws.com'
+DB_HOST = 'mydatabase.cnqug0sk235z.ap-south-1.rds.amazonaws.com'
+DB_PORT = '3306'
+DB_NAME = 'mydatabase'
 
+# MySQL connection URI
+# DATABASE_URI = f"mysql://{DB_USERNAME}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 # MySQL database configuration
 DATABASE_URI = 'mysql://admin:Pu$hkar121@localhost:3306/mydatabase'
 TABLE_NAME = 'grndata'
@@ -110,7 +118,7 @@ def data():
 
 
 # Configuration for SQLAlchemy
-app.config['SQLALCHEMY_DATABASE_URI'] = f"mysql://admin:Pu$hkar121@localhost/mydatabase"
+app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URI
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
