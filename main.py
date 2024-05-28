@@ -15,10 +15,10 @@ import os
 app = Flask(__name__)
 
 # Load database connection details from environment variables
-db_host = os.getenv('DB_HOST')
-db_user = os.getenv('DB_USER')
-db_password = os.getenv('DB_PASSWORD')
-db_name = os.getenv('DB_NAME')
+DB_HOST = os.getenv('DB_HOST')
+DB_USERNAME = os.getenv('DB_USER')
+DB_PASSWORD = os.getenv('DB_PASSWORD')
+DB_NAME = os.getenv('DB_NAME')
 
 # DB_USERNAME = 'admin'
 # DB_PASSWORD = ''
@@ -27,7 +27,7 @@ DB_PORT = '3306'
 # DB_NAME = 'mydatabase'
 
 # MySQL connection URI
-DATABASE_URI = f"mysql://{db_user}:{db_password}@{db_host}:{DB_PORT}/{db_name}"
+DATABASE_URI = f"mysql://{DB_USERNAME}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 # MySQL database configuration
 # DATABASE_URI = 'mysql://admin:Pu$hkar121@localhost:3306/mydatabase'
 TABLE_NAME = 'grndata'
