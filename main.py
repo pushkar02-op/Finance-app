@@ -17,7 +17,6 @@ app = Flask(__name__)
 DB_USERNAME = 'admin'
 DB_PASSWORD = 'Pu$hkar121'
 DB_HOST = 'mydatabase.cnqug0sk235z.ap-south-1.rds.amazonaws.com'
-DB_HOST = 'mydatabase.cnqug0sk235z.ap-south-1.rds.amazonaws.com'
 DB_PORT = '3306'
 DB_NAME = 'mydatabase'
 
