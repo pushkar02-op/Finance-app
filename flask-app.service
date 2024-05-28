@@ -11,7 +11,7 @@ Environment="DB_HOST=${DB_HOST}"
 Environment="DB_USER=${DB_USER}"
 Environment="DB_PASSWORD=${DB_PASSWORD}"
 Environment="DB_NAME=${DB_NAME}"
-ExecStart=/home/ec2-user/flask_app_env/bin/gunicorn --workers 3 --bind unix:/home/ec2-user/flask-app/flask_app.sock -m 007 wsgi:app
+ExecStart=/home/ec2-user/flask_app_env/bin/python /home/ec2-user/flask-app/main.py
 
 [Install]
 WantedBy=multi-user.target
