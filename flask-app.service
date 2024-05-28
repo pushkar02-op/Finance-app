@@ -7,6 +7,10 @@ User=ec2-user
 Group=nginx
 WorkingDirectory=/home/ec2-user/flask-app
 Environment="PATH=/home/ec2-user/flask_app_env/bin"
+Environment="DB_HOST=${DB_HOST}"
+Environment="DB_USER=${DB_USER}"
+Environment="DB_PASSWORD=${DB_PASSWORD}"
+Environment="DB_NAME=${DB_NAME}"
 ExecStart=/home/ec2-user/flask_app_env/bin/gunicorn --workers 3 --bind unix:/home/ec2-user/flask-app/flask_app.sock -m 007 wsgi:app
 
 [Install]
