@@ -11,7 +11,7 @@ Environment="DB_HOST=${DB_HOST}"
 Environment="DB_USER=${DB_USER}"
 Environment="DB_PASSWORD=${DB_PASSWORD}"
 Environment="DB_NAME=${DB_NAME}"
-ExecStart=/home/ubuntu/flask-app/flask_app_env/bin/gunicorn -b 0.0.0.0:5000 --workers 3 --timeout 200 app:app
+ExecStart=/home/ubuntu/flask-app/flask_app_env/bin/gunicorn -b 0.0.0.0:8000 --workers 3 --timeout 200 app:app
 Restart=always
 
 [Install]
