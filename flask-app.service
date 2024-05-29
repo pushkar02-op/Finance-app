@@ -3,15 +3,16 @@ Description=Gunicorn instance to serve flask_app
 After=network.target
 
 [Service]
-User=ec2-user
-Group=nginx
-WorkingDirectory=/home/ec2-user/flask-app
-Environment="PATH=/home/ec2-user/flask_app_env/bin"
+User=ubuntu
+Group=www-data
+WorkingDirectory=/home/ubuntu/flask-app
+Environment="PATH=/home/ubuntu/flask-app/flask_app_env/bin"
 Environment="DB_HOST=${DB_HOST}"
 Environment="DB_USER=${DB_USER}"
 Environment="DB_PASSWORD=${DB_PASSWORD}"
 Environment="DB_NAME=${DB_NAME}"
-ExecStart=/home/ec2-user/flask_app_env/bin/python /home/ec2-user/flask-app/main.py
+ExecStart=/home/ubuntu/flask-app/flask_app_env/bin/gunicorn -b 0.0.0.0:5000 --access-logfile --workers 3 --timeout 200 main:app
+Restart=always
 
 [Install]
 WantedBy=multi-user.target
