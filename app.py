@@ -14,6 +14,9 @@ import os
 
 app = Flask(__name__)
 
+if not os.path.exists('temp'):
+        os.makedirs('temp')
+        
 # Load database connection details from environment variables
 DB_HOST = os.getenv('DB_HOST')
 DB_USERNAME = os.getenv('DB_USER')
@@ -485,6 +488,4 @@ def delete_row():
     return jsonify(success=True)
 
 if __name__ == "__main__":
-    if not os.path.exists('temp'):
-        os.makedirs('temp')
     app.run(host='0.0.0.0',port=8000)
