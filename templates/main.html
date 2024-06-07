@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Monthly Expense</title>
     <link rel="stylesheet" type="text/css" href="/static/css/main.css" />
+    <link rel="stylesheet" type="text/css" href="/static/css/file.css" />
+    <link rel="stylesheet" type="text/css" href="/static/css/data_entry.css" />
+    <link rel="stylesheet" type="text/css" href="/static/css/display.css" />
+
     <link
       rel="stylesheet"
       href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
@@ -69,7 +73,7 @@
           <div id="filedataTable"></div>
           <div class="pagination">
             <button id="firstPage" onclick="showFirstPageGRNData()">
-              First Page
+              First
             </button>
             <button id="prevButton" onclick="showPrevGRNData()">
               Previous
@@ -124,9 +128,7 @@
           </div>
           <div id="dataTable"></div>
           <div class="pagination">
-            <button id="firstPage" onclick="showFirstPageData()">
-              First Page
-            </button>
+            <button id="firstPage" onclick="showFirstPageData()">First</button>
             <button id="prevButton" onclick="showPrevData()">Previous</button>
             <span id="currentPage">Page 1</span>
             <button id="nextButton" onclick="showNextData()">Next</button>
@@ -184,5 +186,6 @@
     <script src="/static/js/options.js"></script>
     <script src="/static/js/main.js"></script>
     <script src="/static/js/file.js"></script>
+    <script src="/static/js/display.js"></script>
   </body>
 </html>

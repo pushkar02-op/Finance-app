@@ -1,0 +1,129 @@
+/* data entry css */
+#form {
+  background-color: #f8f9fa;
+}
+#app {
+  background-color: #f8f9fa;
+}
+#form {
+  padding: 0;
+
+  .entrycontainer {
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    input[type="date"] {
+      width: 100%;
+      padding: 10px;
+      margin: 5px 0;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      box-sizing: border-box;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+  }
+  label {
+    font-size: 16px;
+    font-weight: bold;
+    color: white;
+  }
+  #dataForm {
+    width: 30%;
+    padding: 20px;
+    background-color: #0a74da;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    input[type="date"],
+    input[type="number"],
+    input[type="text"],
+    select,
+    input[type="submit"] {
+      width: 100%;
+      padding: 10px;
+      margin: 5px 0;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      box-sizing: border-box;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+    input[type="submit"] {
+      background-color: #4caf50;
+      color: white;
+      cursor: pointer;
+    }
+    input[type="submit"]:hover,
+    input[type="button"]:hover {
+      background-color: #45a049;
+    }
+  }
+  #dataContainer {
+    max-width: 100%;
+    width: 50%;
+  }
+  #dataTable {
+    min-height: 70vh;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+
+    th,
+    td {
+      border: 1px solid #0a74da;
+      padding: 10px;
+      text-align: left;
+    }
+    th {
+      background-color: #0a74da;
+      color: white;
+    }
+    tbody {
+      max-height: 200px;
+      overflow-y: auto;
+    }
+
+    thead {
+      display: table;
+      width: 100%;
+      table-layout: fixed;
+    }
+  }
+  .pagination {
+    text-align: center;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+  }
+  .pagination button {
+    padding: 10px 20px;
+    margin: 10px 5px;
+    background-color: #4caf50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+
+  .pagination button:hover {
+    background-color: #45a049;
+  }
+
+  .pagination button:disabled {
+    background-color: #ddd;
+    color: #999;
+    cursor: not-allowed;
+  }
+  .notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background-color: #4caf50;
+    color: white;
+    padding: 15px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    display: none;
+  }
+}

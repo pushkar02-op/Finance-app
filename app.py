@@ -24,13 +24,13 @@ DB_PASSWORD = os.getenv('DB_PASSWORD')
 DB_NAME = os.getenv('DB_NAME')
 
 # DB_USERNAME = 'admin'
-# DB_PASSWORD = ''
-# DB_HOST = 'mydatabase.cnqug0sk235z.ap-south-1.rds.amazonaws.com'
-DB_PORT = '3306'
+# DB_PASSWORD = 'Pu$hkar121'
+# DB_HOST = 'localhost'
 # DB_NAME = 'mydatabase'
 
+DB_PORT = '3306'
 # MySQL connection URI
-DATABASE_URI = f"mysql://{DB_USERNAME}:{DB_PASSWORD}@{DB_HOST}/{DB_NAME}"
+DATABASE_URI = f"mysql://{DB_USERNAME}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 # MySQL database configuration
 # DATABASE_URI = 'mysql://admin:Pu$hkar121@localhost:3306/mydatabase'
 TABLE_NAME = 'grndata'

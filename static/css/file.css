@@ -1,0 +1,206 @@
+/* File input CSS */
+input[type="file"] {
+  opacity: 0;
+  width: 0;
+  overflow: hidden;
+  filter: alpha(opacity=0);
+  display: inline;
+  position: absolute;
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+#filetab {
+  display: flex;
+  align-items: flex-start;
+  height: 100%;
+  justify-content: space-around;
+
+  #fileform {
+    width: 30vw;
+    margin-bottom: 5px;
+    border: 1px solid #ddd;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    height: 60vh;
+    overflow-y: auto;
+    cursor: pointer;
+  }
+  .filecontainer {
+    padding-top: 20px;
+  }
+  #filedataContainer {
+    width: 60vw;
+    height: 80vh;
+  }
+  .file-input {
+    display: block;
+    margin-bottom: 20px;
+  }
+  .file-label {
+    font-size: 16px;
+    display: block;
+    margin-bottom: 5px;
+  }
+  .file-list {
+    margin-bottom: 20px;
+    padding-right: 25px;
+  }
+  .file-item {
+    margin-bottom: 5px;
+    position: relative;
+  }
+  .loading-indicator {
+    position: absolute;
+    top: 0;
+    right: -20px;
+    font-size: 16px;
+    display: none; /* Initially hide loading indicator */
+  }
+  .animate {
+    animation: spin 1s infinite linear;
+  }
+  .file-item.success {
+    color: green;
+  }
+  .file-item.error {
+    color: red;
+  }
+  #file-upload-form {
+    display: flex;
+    justify-content: center;
+  }
+  .submit-btn {
+    background-color: #4caf50;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    display: block;
+    margin: 0 auto;
+  }
+  #button {
+    max-width: 100%;
+    font-size: 16px;
+  }
+
+  @keyframes spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  #filedataTable {
+    min-height: 70vh;
+  }
+  input[type="date"] {
+    width: 100%;
+    padding: 10px;
+    margin: 5px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+
+    th,
+    td {
+      border: 1px solid #0a74da;
+      padding: 10px;
+      text-align: left;
+    }
+    th {
+      background-color: #0a74da;
+      color: white;
+    }
+    tbody {
+      max-height: 200px;
+      overflow-y: auto;
+    }
+
+    thead {
+      display: table;
+      width: 100%;
+      table-layout: fixed;
+    }
+  }
+  tr:hover {
+    background-color: #f1f1f1;
+  }
+  .actions {
+    display: none;
+  }
+  tr:hover .actions {
+    display: inline;
+  }
+  .focused-row {
+    background-color: #e0f7fa;
+  }
+  .editable {
+    background-color: #fff3e0;
+  }
+  .edit-icon,
+  .delete-icon {
+    cursor: pointer;
+    margin-left: 5px;
+  }
+  .pagination {
+    text-align: center;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+  }
+  .pagination button {
+    padding: 10px 20px;
+    margin: 10px 5px;
+    background-color: #4caf50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+
+  .pagination button:hover {
+    background-color: #45a049;
+  }
+
+  .pagination button:disabled {
+    background-color: #ddd;
+    color: #999;
+    cursor: not-allowed;
+  }
+  #notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background-color: #333;
+    color: #fff;
+    padding: 10px;
+    border-radius: 5px;
+    z-index: 9999;
+    display: none;
+  }
+
+  #notification.show {
+    display: block;
+  }
+
+  #notification.success {
+    background-color: green;
+  }
+
+  #notification.error {
+    background-color: red;
+  }
+}
