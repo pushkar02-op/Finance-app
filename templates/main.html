@@ -91,9 +91,25 @@
     <div id="form" class="tabcontent">
       <div class="entrycontainer">
         <form id="dataForm" method="post" action="/submit">
-          <h2>Data Entry Form</h2>
           <label for="date">Date:</label><br />
           <input type="date" id="date" name="date" required /><br />
+          <label for="store">Store:</label><br />
+          <select id="store" name="store" required>
+            <option value="">Select a store</option>
+            <option value="SP_BH_Bhagalpur_Urmila_Arcade">
+              SP_BH_Bhagalpur_Urmila_Arcade
+            </option>
+            <option value="KEOTA_CC_RRL">KEOTA_CC_RRL</option>
+            <option value="SP_BH_Bhagalpur_Khanjarpur">
+              SP_BH_Bhagalpur_Khanjarpur
+            </option>
+            <option value="SMT_BH_Bhagalpur_Kashyap_Plaza">
+              SMT_BH_Bhagalpur_Kashyap_Plaza
+            </option>
+            <option value="SP_BH_Banka_Central_Mall">
+              SP_BH_Banka_Central_Mall
+            </option></select
+          ><br />
           <label for="item">Item:</label><br />
           <select id="item" name="item" required>
             <option value="">Select an item</option></select

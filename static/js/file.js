@@ -128,12 +128,16 @@ function displayGRNData(data) {
                       <td>${row.ITEM}</td>
                       <td contenteditable="false">${row.QUANTITY}</td>
                       <td contenteditable="false">${row.PRICE}</td>
-                      <td >${row.TOTAL}</td>
+                      <td >${numberWithCommas(row.TOTAL)}</td>
                       <td >${row.STORENAME}</td>
                      <td>
                       <span class="actions">
-                      <span class="edit-icon" onclick="editRow(this, ${row.SR_NO})">✏️</span>
-                      <span class="delete-icon" onclick="deleteRow(this, ${row.SR_NO})">🗑️</span>
+                      <span class="edit-icon" onclick="editRow(this, ${
+                        row.SR_NO
+                      })">✏️</span>
+                      <span class="delete-icon" onclick="deleteRow(this, ${
+                        row.SR_NO
+                      })">🗑️</span>
                     </span>
                     </td>
                   `;

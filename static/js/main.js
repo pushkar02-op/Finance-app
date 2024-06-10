@@ -68,9 +68,10 @@ function displayData(data) {
               <tr>
                   
                   <th style="width:50%">Item</th>
-                  <th>Quantity</th>
-                  <th>Price</th>
-                  <th>Total</th>
+                  <th style="width:18%">Store</th>
+                  <th style="width:10%">Quantity</th>
+                  <th style="width:10%">Price</th>
+                  <th style="width:15%">Total</th>
               </tr>
           `;
 
@@ -79,12 +80,21 @@ function displayData(data) {
 
   for (let i = startIndex; i < endIndex; i++) {
     const row = data[i];
+    row.store = row.store
+      .split("_")
+      .map((part) => part.substring(0, Math.min(3, part.length)))
+      .join("");
+    if (row.store.length > 12) {
+      const extraLettersToRemove = row.store.length - 12;
+      row.store = row.store.substring(extraLettersToRemove);
+    }
     const tr = document.createElement("tr");
     tr.innerHTML = `
                   <td>${row.item}</td>
+                  <td>${row.store}</td>
                   <td>${row.qty}</td>
-                  <td>${row.price}</td>
-                  <td>${row.total}</td>
+                  <td>${numberWithCommas(row.price)}</td>
+                  <td>${numberWithCommas(row.total)}</td>
               `;
     table.appendChild(tr);
   }
@@ -141,6 +151,10 @@ function updateTotal() {
   var price = parseFloat(document.getElementById("price").value);
   var total = qty * price;
   document.getElementById("total").value = total.toFixed(2);
+}
+
+function numberWithCommas(x) {
+  return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
 
 function clearForm() {

@@ -41,7 +41,7 @@ function calculateMonthlyProfitLoss(data) {
     0
   );
   document.getElementById("monthly-profit-loss-amount").textContent =
-    totalProfitLoss.toFixed(2);
+    numberWithCommas(totalProfitLoss.toFixed(2));
 }
 
 function renderTable(data, page, rowsPerPage) {
@@ -58,10 +58,10 @@ function renderTable(data, page, rowsPerPage) {
     tr.dataset.date = row.date;
     tr.innerHTML = `
                     <td>${row.date}</td>
-                    <td>${row.total_spent}</td>
-                    <td>${row.total_received}</td>
-                    <td>${row.other_costs}</td>
-                    <td>${row.daily_profit_loss}</td>
+                    <td>${numberWithCommas(row.total_spent)}</td>
+                    <td>${numberWithCommas(row.total_received)}</td>
+                    <td>${numberWithCommas(row.other_costs)}</td>
+                    <td>${numberWithCommas(row.daily_profit_loss)}</td>
                 `;
     tr.addEventListener("click", () => toggleRowDetails(tr, row.items));
     tbody.appendChild(tr);
@@ -131,9 +131,9 @@ function renderChildTable(items, tableId, page) {
     tr.classList.add(itemClass);
     tr.innerHTML = `
                     <td>${item.item}</td>
-                    <td>${item.total_spent}</td>
-                    <td>${item.total_received}</td>
-                    <td>${item.daily_profit_loss}</td>
+                    <td>${numberWithCommas(item.total_spent)}</td>
+                    <td>${numberWithCommas(item.total_received)}</td>
+                    <td>${numberWithCommas(item.daily_profit_loss)}</td>
                 `;
     tbody.appendChild(tr);
   });

@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
 import pandas as pd
 import pdfplumber
 from sqlalchemy import create_engine, inspect,text, Table, Column, Integer, String, Float, MetaData, DateTime,UniqueConstraint
@@ -41,7 +42,7 @@ engine = create_engine(DATABASE_URI)
 
 # Function to retrieve data from tables
 def get_data_from_db(engine, table_name, start_date, end_date):
-    query = f"SELECT * FROM {table_name} where date between '{start_date}' and '{end_date}' ORDER BY date desc, item"
+    query = f"SELECT date, item, SUM(total) total, SUM(qty) qty, AVG(price) price FROM {table_name} where date between '{start_date}' and '{end_date}' GROUP BY date, item ORDER BY date desc, item"
     return pd.read_sql(query, engine)
 
 def get_recdata_from_db(engine, table_name, start_date, end_date):
@@ -130,10 +131,13 @@ app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URI
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
+migrate = Migrate(app, db)
+
 
 class SpentData(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     date = db.Column(db.DateTime, nullable=False)
+    store = db.Column(db.String(50), nullable=False)
     item = db.Column(db.String(100), nullable=False)
     qty = db.Column(db.Float, nullable=False)
     price = db.Column(db.Float, nullable=False)
@@ -150,21 +154,22 @@ def home():
 @app.route("/submit", methods=["POST"])
 def submit():
     date = request.form["date"]
+    store = request.form["store"]
     item = request.form["item"]
     qty = request.form["qty"]
     price = request.form["price"]
     total = request.form["total"]
 
-    # Check if data with the same date and item already exists
-    existing_data = SpentData.query.filter_by(date=date, item=item).first()
+     # Check if data with the same date, item, and store already exists
+    existing_data = SpentData.query.filter_by(date=date, item=item, store=store).first()
     if existing_data:
-        # Update existing row with the same date and item
+        # Update existing row with the same date, store and item
         existing_data.qty = qty
         existing_data.price = price
         existing_data.total = total
     else:
         # If data with the same date and item does not exist, create a new row
-        new_data = SpentData(date=date, item=item, qty=qty, price=price, total=total)
+        new_data = SpentData(date=date, store=store, item=item, qty=qty, price=price, total=total)
         db.session.add(new_data)
     
     db.session.commit()
@@ -182,6 +187,7 @@ def get_data():
     for row in data:
         row_data = {
             "date": row.date,
+            "store": row.store,
             "item": row.item,
             "qty": row.qty,
             "price": row.price,
@@ -190,6 +196,7 @@ def get_data():
         result.append(row_data)
 
     return jsonify(result)
+
 
 ##File data backend
 
@@ -488,4 +495,4 @@ def delete_row():
     return jsonify(success=True)
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0',port=8000)
+    app.run(host='0.0.0.0',port=8000,debug=True)
