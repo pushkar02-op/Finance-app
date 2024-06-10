@@ -100,11 +100,11 @@ function displayGRNData(data) {
   const table = document.createElement("table");
   table.innerHTML = `
                   <tr>
-                      <th style="width:35%">ITEM</th>
+                      <th id="sort-item" class="sort-indicator" style="width:35%">ITEM </th>
                       <th style="width:10%">QTY </th>
                       <th style="width:10%">PRICE</th>
                       <th style="width:13%">TOTAL</th>
-                      <th >STORENAME</th>
+                      <th id="sort-storename" class="sort-indicator" >STORENAME </th>
                       <th>ACTIONS</th>
                   </tr>
               `;
@@ -148,9 +148,10 @@ function displayGRNData(data) {
   const dataTable = document.getElementById("filedataTable");
   dataTable.innerHTML = "";
   dataTable.appendChild(table);
+  sort();
 }
-function fetchAndDisplayGRNData(date) {
-  fetch(`/FILEDATA?reqdate=${date}`)
+function fetchAndDisplayGRNData(date, column = "item", sortOrder = "asc") {
+  fetch(`/FILEDATA?reqdate=${date}&column=${column}&sortorder=${sortOrder}`)
     .then((response) => response.json())
     .then((responseData) => {
       totalPages = Math.ceil(responseData.length / pageSize);
@@ -272,5 +273,44 @@ function deleteRow(deleteIcon, srNo) {
       showNotification("Error deleting row", "error");
       console.error("Error deleting row:", error);
     });
+}
+
+function numberWithCommas(x) {
+  return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+
+function updateSortIndicators(column) {
+  // Determine current sort order and toggle it
+  if (currentSortColumn === column) {
+    sortOrder = -sortOrder; // Toggle sort order if the same column is clicked again
+  } else {
+    sortOrder = 1; // Default to ascending order for a new column
+  }
+  currentSortColumn = column;
+  const headers = document.querySelectorAll("th.sort-indicator");
+  headers.forEach((header) => {
+    // header.classList.remove("sort-asc", "sort-desc");
+    if (header.id === `sort-${column}`) {
+      header.classList.add(sortOrder === 1 ? "sort-asc" : "sort-desc");
+    }
+  });
+  fetchAndDisplayGRNData(
+    selectedGRNDate,
+    column,
+    sortOrder == 1 ? "asc" : "desc"
+  );
+}
+
+let sortOrder = 1;
+let currentSortColumn = "";
+
+function sort() {
+  document.getElementById("sort-item").addEventListener("click", () => {
+    updateSortIndicators("item");
+  });
+
+  document.getElementById("sort-storename").addEventListener("click", () => {
+    updateSortIndicators("storename");
+  });
 }
 updateGRNPagination();

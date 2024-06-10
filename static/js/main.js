@@ -67,9 +67,9 @@ function displayData(data) {
   table.innerHTML = `
               <tr>
                   
-                  <th style="width:50%">Item</th>
-                  <th style="width:18%">Store</th>
-                  <th style="width:10%">Quantity</th>
+                  <th style="width:45%">Item</th>
+                  <th style="width:20%">Store</th>
+                  <th style="width:10%">Qty</th>
                   <th style="width:10%">Price</th>
                   <th style="width:15%">Total</th>
               </tr>

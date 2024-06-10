@@ -18,16 +18,16 @@ app = Flask(__name__)
 if not os.path.exists('temp'):
         os.makedirs('temp')
         
-# Load database connection details from environment variables
-DB_HOST = os.getenv('DB_HOST')
-DB_USERNAME = os.getenv('DB_USER')
-DB_PASSWORD = os.getenv('DB_PASSWORD')
-DB_NAME = os.getenv('DB_NAME')
+# # Load database connection details from environment variables
+# DB_HOST = os.getenv('DB_HOST')
+# DB_USERNAME = os.getenv('DB_USER')
+# DB_PASSWORD = os.getenv('DB_PASSWORD')
+# DB_NAME = os.getenv('DB_NAME')
 
-# DB_USERNAME = 'admin'
-# DB_PASSWORD = 'Pu$hkar121'
-# DB_HOST = 'localhost'
-# DB_NAME = 'mydatabase'
+DB_USERNAME = 'admin'
+DB_PASSWORD = 'Pu$hkar121'
+DB_HOST = 'localhost'
+DB_NAME = 'mydatabase'
 
 DB_PORT = '3306'
 # MySQL connection URI
@@ -35,7 +35,7 @@ DATABASE_URI = f"mysql://{DB_USERNAME}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAM
 # MySQL database configuration
 # DATABASE_URI = 'mysql://admin:Pu$hkar121@localhost:3306/mydatabase'
 TABLE_NAME = 'grndata'
-HASH_TABLE_NAME = 'file_hashes'
+# HASH_TABLE_NAME = 'file_hashes'
 
 # Create a connection to the database
 engine = create_engine(DATABASE_URI)
@@ -218,14 +218,14 @@ data_table = Table(
     Column('StoreName', String(255))
 )
 
-hash_table = Table(
-    HASH_TABLE_NAME, metadata,
-    Column('id', Integer, primary_key=True, autoincrement=True),
-    Column('file_hash', String(64), nullable=False),
-    Column('store_name', String(255)),
-    Column('file_date', DateTime),
-    UniqueConstraint('file_hash', 'store_name', 'file_date', name='unique_file')
-)
+# hash_table = Table(
+#     HASH_TABLE_NAME, metadata,
+#     Column('id', Integer, primary_key=True, autoincrement=True),
+#     Column('file_hash', String(64), nullable=False),
+#     Column('store_name', String(255)),
+#     Column('file_date', DateTime),
+#     UniqueConstraint('file_hash', 'store_name', 'file_date', name='unique_file')
+# )
 
 # Create tables if they don't exist
 metadata.create_all(engine)
@@ -235,41 +235,41 @@ def table_exists(engine, table_name):
     inspector = inspect(engine)
     return table_name in inspector.get_table_names()
 
-def compute_file_hash(file_path):
-    hash_func = hashlib.sha256()
-    with open(file_path, 'rb') as f:
-        while chunk := f.read(8192):
-            hash_func.update(chunk)
-    return hash_func.hexdigest()
+# def compute_file_hash(file_path):
+#     hash_func = hashlib.sha256()
+#     with open(file_path, 'rb') as f:
+#         while chunk := f.read(8192):
+#             hash_func.update(chunk)
+#     return hash_func.hexdigest()
 
 
-def is_duplicate_file(file_hash, store_name, file_date):
-    with engine.connect() as connection:
-        query = text(f"""
-        SELECT COUNT(*) 
-        FROM {HASH_TABLE_NAME} 
-        WHERE file_hash = :file_hash 
-        AND store_name = :store_name 
-        AND file_date = :file_date
-        """)
-        params = {'file_hash': file_hash, 'store_name': store_name, 'file_date': file_date}
-        result = connection.execute(query, params).scalar()
-        return result > 0
+# def is_duplicate_file(file_hash, store_name, file_date):
+#     with engine.connect() as connection:
+#         query = text(f"""
+#         SELECT COUNT(*) 
+#         FROM {HASH_TABLE_NAME} 
+#         WHERE file_hash = :file_hash 
+#         AND store_name = :store_name 
+#         AND file_date = :file_date
+#         """)
+#         params = {'file_hash': file_hash, 'store_name': store_name, 'file_date': file_date}
+#         result = connection.execute(query, params).scalar()
+#         return result > 0
 
 
-def store_file_hash(file_hash, store_name, file_date):
-    with engine.connect() as connection:
-        metadata.create_all(engine)
-        query = text(f"""
-        INSERT INTO {HASH_TABLE_NAME} (file_hash, store_name, file_date) 
-        VALUES ('{file_hash}', '{store_name}', '{file_date}')
-        """)        
-        try:
-            connection.execute(query)
-            connection.commit()  
-            print("Data inserted into hash table successfully!")
-        except SQLAlchemyError as e:
-            print(f"Error inserting data into hash table: {e}")
+# def store_file_hash(file_hash, store_name, file_date):
+#     with engine.connect() as connection:
+#         metadata.create_all(engine)
+#         query = text(f"""
+#         INSERT INTO {HASH_TABLE_NAME} (file_hash, store_name, file_date) 
+#         VALUES ('{file_hash}', '{store_name}', '{file_date}')
+#         """)        
+#         try:
+#             connection.execute(query)
+#             connection.commit()  
+#             print("Data inserted into hash table successfully!")
+#         except SQLAlchemyError as e:
+#             print(f"Error inserting data into hash table: {e}")
         
     
 # Function to store data to MySQL database
@@ -289,7 +289,7 @@ def store_to_db(df, engine, table):
 # Function to process a single PDF file
 def process_pdf(input_file):
     file_size = os.path.getsize(input_file)
-    file_hash = compute_file_hash(input_file)
+    # file_hash = compute_file_hash(input_file)
 
     # Extract tables from PDF using pdfplumber
     with pdfplumber.open(input_file) as pdf:
@@ -318,9 +318,9 @@ def process_pdf(input_file):
     file_date = datetime.strptime(date_str, "%d.%m.%Y")
     df['Date'] = file_date
 
-    if is_duplicate_file(file_hash, place_name, file_date):
-        print(f"Duplicate file detected for {place_name} on {file_date}. Skipping processing.")
-        return
+    # if is_duplicate_file(file_hash, place_name, file_date):
+    #     print(f"Duplicate file detected for {place_name} on {file_date}. Skipping processing.")
+    #     return
     
     df=df[8:]
 
@@ -393,7 +393,7 @@ def process_pdf(input_file):
     df['Total'] = round(df['Total'], 2)
 
     store_to_db(df, engine, data_table)
-    store_file_hash(file_hash, place_name, file_date)
+    # store_file_hash(file_hash, place_name, file_date)
 
 @app.route('/FILEDATA', methods=['GET', 'POST'])
 def file_data():
@@ -429,12 +429,15 @@ def file_data():
     
     elif request.method=='GET':
         req_date = request.args.get("reqdate")
+        req_column = request.args.get("column")
+        req_order = request.args.get("sortorder")
+        
         with engine.connect() as connection:
             query = text(f"""
             SELECT * 
             FROM {TABLE_NAME} 
             WHERE Date = '{req_date}' 
-            ORDER BY Date desc, item 
+            ORDER BY  {req_column} {req_order}
             """)
             grndata = connection.execute(query).fetchall()
                 

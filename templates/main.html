@@ -93,6 +93,10 @@
         <form id="dataForm" method="post" action="/submit">
           <label for="date">Date:</label><br />
           <input type="date" id="date" name="date" required /><br />
+          <label for="item">Item:</label><br />
+          <select id="item" name="item" required>
+            <option value="">Select an item</option></select
+          ><br />
           <label for="store">Store:</label><br />
           <select id="store" name="store" required>
             <option value="">Select a store</option>
@@ -110,10 +114,7 @@
               SP_BH_Banka_Central_Mall
             </option></select
           ><br />
-          <label for="item">Item:</label><br />
-          <select id="item" name="item" required>
-            <option value="">Select an item</option></select
-          ><br />
+
           <label for="qty">Quantity:</label><br />
           <input
             type="number"

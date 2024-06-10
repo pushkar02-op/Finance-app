@@ -104,7 +104,9 @@ function toggleRowDetails(tr, items) {
                         <thead>
                             <tr>
                                 <th>Item</th>
+                                <th>Purchase Qty</th>
                                 <th>Total Spent</th>
+                                <th>GRN Qty</th>
                                 <th>Total Received</th>
                                 <th>Daily Profit/Loss</th>
                             </tr>
@@ -131,7 +133,9 @@ function renderChildTable(items, tableId, page) {
     tr.classList.add(itemClass);
     tr.innerHTML = `
                     <td>${item.item}</td>
+                    <td>${numberWithCommas(item.qty_spent)}</td>
                     <td>${numberWithCommas(item.total_spent)}</td>
+                    <td>${numberWithCommas(item.qty_received)}</td>
                     <td>${numberWithCommas(item.total_received)}</td>
                     <td>${numberWithCommas(item.daily_profit_loss)}</td>
                 `;

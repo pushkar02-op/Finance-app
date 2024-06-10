@@ -204,3 +204,11 @@ h1 {
     background-color: red;
   }
 }
+
+.sort-asc::after {
+  content: "▲";
+}
+
+.sort-desc::after {
+  content: "▼";
+}
