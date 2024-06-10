@@ -19,15 +19,15 @@ if not os.path.exists('temp'):
         os.makedirs('temp')
         
 # # Load database connection details from environment variables
-# DB_HOST = os.getenv('DB_HOST')
-# DB_USERNAME = os.getenv('DB_USER')
-# DB_PASSWORD = os.getenv('DB_PASSWORD')
-# DB_NAME = os.getenv('DB_NAME')
+DB_HOST = os.getenv('DB_HOST')
+DB_USERNAME = os.getenv('DB_USER')
+DB_PASSWORD = os.getenv('DB_PASSWORD')
+DB_NAME = os.getenv('DB_NAME')
 
-DB_USERNAME = 'admin'
-DB_PASSWORD = 'Pu$hkar121'
-DB_HOST = 'localhost'
-DB_NAME = 'mydatabase'
+# DB_USERNAME = 'admin'
+# DB_PASSWORD = 'Pu$hkar121'
+# DB_HOST = 'localhost'
+# DB_NAME = 'mydatabase'
 
 DB_PORT = '3306'
 # MySQL connection URI
