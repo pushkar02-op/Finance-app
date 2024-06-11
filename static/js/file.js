@@ -169,26 +169,41 @@ function updateGRNPagination() {
 // Function to go to the first page
 function showFirstPageGRNData() {
   currentGRNPage = 1;
-  fetchAndDisplayGRNData(selectedGRNDate);
+  fetchAndDisplayGRNData(
+    selectedGRNDate,
+    currentSortColumn,
+    sortOrder == 1 ? "asc" : "desc"
+  );
   updateGRNPagination();
 }
 function showPrevGRNData() {
   if (currentGRNPage > 1) {
     currentGRNPage--;
-    fetchAndDisplayGRNData(selectedGRNDate);
+    fetchAndDisplayGRNData(
+      selectedGRNDate,
+      currentSortColumn,
+      sortOrder == 1 ? "asc" : "desc"
+    );
     updateGRNPagination();
   }
 }
 
 function showNextGRNData() {
   currentGRNPage++;
-  fetchAndDisplayGRNData(selectedGRNDate);
+  fetchAndDisplayGRNData(
+    selectedGRNDate,
+    currentSortColumn,
+    sortOrder == 1 ? "asc" : "desc"
+  );
   updateGRNPagination();
 }
 function showLastPageGRNData() {
   //   currentGRNPage = totalPages;
-  console.log(selectedGRNDate);
-  fetchAndDisplayGRNData(selectedGRNDate);
+  fetchAndDisplayGRNData(
+    selectedGRNDate,
+    currentSortColumn,
+    sortOrder == 1 ? "asc" : "desc"
+  );
   updateGRNPagination();
 }
 
