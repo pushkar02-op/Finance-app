@@ -152,13 +152,20 @@ This project demonstrates a Flask application that connects to an AWS RDS MySQL 
 ### Directory Structure
 
 project-root/
+
 ├── app.py
+
 ├── requirements.txt
+
 ├── templates/
+
 │ └── main.html
+
 ├── static/
+
 │ └── ...
 └── temp/
+
 └── ...
 
 ## Releasing a New Version
