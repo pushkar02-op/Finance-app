@@ -68,54 +68,149 @@ This project demonstrates a Flask application that connects to an AWS RDS MySQL 
 
 ## API Endpoints
 
-1. **GET /data**
+## Endpoints
 
-   - Retrieve daily spent and received data within a date range.
-   - Parameters:
-     - `start_date` (required): Start date in YYYY-MM-DD format.
-     - `end_date` (required): End date in YYYY-MM-DD format.
-   - Response: JSON object containing the daily summary of spent, received, and profit/loss data.
+### 1. Home Endpoint
 
-2. **POST /submit**
+#### `GET /`
 
-   - Submit spent data.
-   - Parameters:
-     - `date` (required): Date of the record.
-     - `item` (required): Item name.
-     - `qty` (required): Quantity.
-     - `price` (required): Price per unit.
-     - `total` (required): Total amount.
-   - Response: Message indicating the success of the operation.
+**Description:** Renders the main HTML page.
 
-3. **GET /get_data**
+**Request Parameters:** None
 
-   - Retrieve spent data for a specific date.
-   - Parameters:
-     - `reqdate` (required): Date in YYYY-MM-DD format.
-   - Response: JSON object containing the spent data for the specified date.
+**Response:**
 
-4. **POST /FILEDATA**
+- Renders the `main.html` page.
 
-   - Upload and process PDF files.
-   - Parameters:
-     - `files` (required): PDF files to be processed.
-   - Response: JSON object indicating the success or failure of each file processing.
+### 2. Submit Data Endpoint
 
-5. **POST /updateRow**
+#### `POST /submit`
 
-   - Update a row in the database.
-   - Parameters:
-     - `SR_NO` (required): Serial number of the row to be updated.
-     - `QUANTITY` (required): Updated quantity.
-     - `PRICE` (required): Updated price.
-     - `TOTAL` (required): Updated total amount.
-   - Response: JSON object indicating the success of the operation.
+**Description:** Submits data related to spent items to the database.
 
-6. **POST /deleteRow**
-   - Delete a row from the database.
-   - Parameters:
-     - `SR_NO` (required): Serial number of the row to be deleted.
-   - Response: JSON object indicating the success of the operation.
+**Request Parameters:**
+
+- `date` (string): Date of the transaction.
+- `store` (string): Store name.
+- `item` (string): Item name.
+- `qty` (float): Quantity of the item.
+- `price` (float): Price of the item.
+- `total` (float): Total cost of the item.
+
+**Response:**
+
+- `200 OK`: "Data submitted successfully!"
+
+### 3. Get Data Endpoint
+
+#### `GET /get_data`
+
+**Description:** Retrieves spent data for a specific date.
+
+**Request Parameters:**
+
+- `reqdate` (string): Date for which the data is requested.
+
+**Response:**
+
+- `200 OK`: JSON array of data objects containing:
+  - `date` (string)
+  - `store` (string)
+  - `item` (string)
+  - `qty` (float)
+  - `price` (float)
+  - `total` (float)
+
+### 4. Data Analysis Endpoint
+
+#### `GET /data`
+
+**Description:** Retrieves a summary of spent and received data between specified dates, including daily profit/loss and other costs.
+
+**Request Parameters:**
+
+- `start_date` (string): Start date for the data range.
+- `end_date` (string): End date for the data range.
+
+**Response:**
+
+- `200 OK`: JSON array of summarized data objects containing:
+  - `date` (string)
+  - `total_spent` (float)
+  - `total_received` (float)
+  - `daily_profit_loss` (float)
+  - `other_costs` (float)
+  - `items` (array): List of item objects with details.
+
+### 5. File Data Endpoint
+
+#### `POST /FILEDATA`
+
+**Description:** Uploads and processes PDF files to extract and store data in the database.
+
+**Request Parameters:**
+
+- Files are uploaded through a multipart/form-data request with `files` field.
+
+**Response:**
+
+- `200 OK`: JSON array of objects containing:
+  - `filename` (string)
+  - `success` (boolean)
+  - `error` (string, optional)
+
+#### `GET /FILEDATA`
+
+**Description:** Retrieves data from the database for a specific date, sorted by a specified column in a specified order.
+
+**Request Parameters:**
+
+- `reqdate` (string): Date for which the data is requested.
+- `column` (string): Column name to sort by.
+- `sortorder` (string): Order to sort the column (ASC or DESC).
+
+**Response:**
+
+- `200 OK`: JSON array of data objects containing:
+  - `SR_NO` (integer)
+  - `ITEM` (string)
+  - `QUANTITY` (float)
+  - `PRICE` (float)
+  - `TOTAL` (float)
+  - `STORENAME` (string)
+
+### 6. Update Row Endpoint
+
+#### `POST /updateRow`
+
+**Description:** Updates a specific row in the database.
+
+**Request Parameters:**
+
+- JSON object containing:
+  - `SR_NO` (integer): Serial number of the row to update.
+  - `QUANTITY` (float): Updated quantity.
+  - `PRICE` (float): Updated price.
+  - `TOTAL` (float): Updated total.
+
+**Response:**
+
+- `200 OK`: JSON object containing `success` (boolean).
+
+### 7. Delete Row Endpoint
+
+#### `POST /deleteRow`
+
+**Description:** Deletes a specific row from the database.
+
+**Request Parameters:**
+
+- JSON object containing:
+  - `SR_NO` (integer): Serial number of the row to delete.
+
+**Response:**
+
+- `200 OK`: JSON object containing `success` (boolean).
 
 ## Database Schema
 
