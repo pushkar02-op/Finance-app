@@ -208,7 +208,6 @@ function showLastPageGRNData() {
 }
 
 function editRow(editIcon, srNo) {
-  console.log("Editing row:", srNo); // Debugging log
   const row = editIcon.closest("tr");
   row.classList.add("focused-row");
   row.cells[1].contentEditable = "true";
@@ -216,7 +215,6 @@ function editRow(editIcon, srNo) {
 
   row.cells[1].classList.add("editable");
   row.cells[2].classList.add("editable");
-  console.log("clicked");
   const saveButton = document.createElement("button");
   saveButton.textContent = "Save";
   saveButton.onclick = function () {
@@ -317,7 +315,7 @@ function updateSortIndicators(column) {
 }
 
 let sortOrder = 1;
-let currentSortColumn = "";
+let currentSortColumn = "item";
 
 function sort() {
   document.getElementById("sort-item").addEventListener("click", () => {
