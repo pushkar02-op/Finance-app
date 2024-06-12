@@ -280,7 +280,11 @@ function deleteRow(deleteIcon, srNo) {
     .then((response) => response.json())
     .then((data) => {
       showNotification("Row deleted successfully", "success");
-      fetchAndDisplayGRNData(selectedGRNDate); // Refresh the table data
+      fetchAndDisplayGRNData(
+        selectedGRNDate,
+        currentSortColumn,
+        sortOrder == 1 ? "asc" : "desc"
+      ); // Refresh the table data
     })
     .catch((error) => {
       showNotification("Error deleting row", "error");
